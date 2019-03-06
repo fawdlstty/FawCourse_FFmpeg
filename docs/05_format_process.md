@@ -215,7 +215,7 @@ int main (int argc, char* argv[]) {
 }
 ```
 
-[返回首页](../README.md) | [上一章 Hello FFmpeg](./04_hello_ffmpeg.md) | 下一章
+[返回首页](../README.md) | [上一章 Hello FFmpeg](./04_hello_ffmpeg.md) | [下一章 FFmpeg与其他库的交互](./06_interaction.md)
 
 ## 许可
 

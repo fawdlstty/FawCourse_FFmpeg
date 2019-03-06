@@ -35,6 +35,13 @@ FFmpeg教程，个人维护版本
 	+ 音视频格式转换
 	+ 程序结构
 
+- [**第六章 FFmpeg与其他库的交互**](docs/06_interaction.md)
+	+ AVFrame与Qt图片互转
+	+ AVFrame与GDI+图片互转
+	+ SDL2播放视频
+	+ SDL2播放音频
+	+ wave函数播放音频
+
 ## 许可
 
 [![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
