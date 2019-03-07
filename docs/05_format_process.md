@@ -137,6 +137,56 @@ AVFrame *_audio_format_convet (AVFrame *_frame_src, AVSampleFormat _new_sample_f
 }
 ```
 
+## 音频帧采样数调节
+
+很多时候读取的采样数与需写入的采样数不一致。比如从麦克风读了22050个采样，按照44.1KHz算，一帧为0.5秒。但假如需写入的一帧采样要求1024个采样数，大概23毫秒，这时候我们就需要调节采样数了，将一帧拆分为多帧或者将多帧合并成一帧。
+
+这时候我们用到一个队列，这个队列将所有音频全部合并起来，根据帧的采样数量来合成新的帧。
+
+```cpp
+// 初始化fifo
+AVAudioFifo *_audio_fifo = av_audio_fifo_alloc (m_sample_format, m_channels, 1);
+if (!_audio_fifo) {
+    printf ("av_audio_fifo_alloc failed \n");
+    return;
+}
+
+// 写第一帧时存放公共数据
+int _channels = _frame_in->channels;
+uint64_t _channel_layout = _frame_in->channel_layout;
+AVSampleFormat _sample_format = (AVSampleFormat) _frame_in->format;
+int _sample_rate = _frame_in->sample_rate;
+
+// 写入一帧数据
+int _ret = av_audio_fifo_realloc (_audio_fifo, av_audio_fifo_size (_audio_fifo) + _frame_in->nb_samples);
+if (_ret != 0) {
+    printf ("av_audio_fifo_realloc failed %d \n", _ret);
+    return;
+}
+if ((_ret = av_audio_fifo_write (_audio_fifo, (void**) _frame_in->data, _frame_in->nb_samples)) <= 0) {
+    printf ("av_audio_fifo_write failed %d \n", _ret);
+    return;
+}
+
+// 按 _nb_samples 的数量来读采样
+int _nb_samples = 1024;
+AVFrame *_frame_out = nullptr;
+if (_audio_fifo && _nb_samples <= av_audio_fifo_size (_audio_fifo)) {
+    _frame_out = av_frame_alloc ();
+    _frame_out->nb_samples = _nb_samples;
+    _frame_out->channels = _channels;
+    _frame_out->channel_layout = _channel_layout;
+    _frame_out->format = _sample_format;
+    _frame_out->sample_rate = _sample_rate;
+    av_frame_get_buffer (_frame_out, 0);
+    av_audio_fifo_read (_audio_fifo, (void**) _frame_out->data, _frame_out->nb_samples);
+}
+
+// 释放fifo
+av_audio_fifo_free (_audio_fifo);
+_audio_fifo = nullptr;
+```
+
 ## 程序结构
 
 下面我给出一个实战的将摄像头和麦克风数据读取，然后存为文件的伪代码的示例。当然此处是有问题的，单线程肯定不合适，不过，至少实现了。
