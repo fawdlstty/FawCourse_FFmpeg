@@ -280,6 +280,72 @@ if (pSysDevEnum)
     pSysDevEnum->Release ();
 ```
 
+## 程序结构
+
+对于播放器来说，只需要解码然后展示就行了
+
+```cpp
+#include <头文件>
+
+int main (int argc, char* argv[]) {
+    // 初始化
+    // 打开输入流
+    new_thread {
+        while (_run) {
+            // 图像处理
+            // 从摄像头输入流中读一个AVPacket
+            // 将AVPacket解码为AVFrame
+            // 根据实际需求考虑是否需要转换AVFrame的像素格式
+            // 展示图片（SDL2或者其他界面库）
+        }
+    }
+    new_thread {
+        while (_run) {
+            // 音频处理
+            // 从麦克风输入流中读一个AVPacket
+            // 将AVPacket解码为AVFrame
+            // 根据实际需求考虑是否需要转换AVFrame的采样格式
+            // 播放声音（SDL2或其他音频库）
+        }
+    }
+    while (_run) {
+        // wait...
+    }
+    // 关闭输入流
+    return 0;
+}
+```
+
+对于一个视频监控软件来说，由于需要一边读摄像头一边展示，还要一边存文件，但不用读声音了，所以架构就是把这两者合并起来
+
+```cpp
+#include <头文件>
+
+int main (int argc, char* argv[]) {
+    // 初始化
+    // 打开摄像头
+    // 打开输出流
+    new_thread {
+        while (_run) {
+            // 图像处理
+            // 从摄像头输入流中读一个AVPacket
+            // 将AVPacket解码为AVFrame
+            // 根据实际需求考虑是否需要转换AVFrame的像素格式
+            // 展示图片（SDL2或者其他界面库）
+            // 将AVFrame编码为AVPacket
+            // send一帧
+            // 控制速度
+        }
+    }
+    while (_run) {
+        // wait...
+    }
+    // 关闭输出流
+    // 关闭摄像头输入流
+    return 0;
+}
+```
+
 [返回首页](../README.md) | [上一章 音视频格式处理](./05_format_process.md) | 下一章
 
 ## 许可
