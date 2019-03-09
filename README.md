@@ -10,6 +10,10 @@ FFmpeg教程，个人维护版本
     + 目标读者
 
 - [**第一章 视频基础**(暂未编写)](docs/01_video_introduce.md)
+    + 颜色空间
+        * RGB颜色空间
+        * YUV颜色空间
+    + 推荐资料
 - [**第二章 音频基础**(暂未编写)](docs/02_audio_introduce.md)
 - [**第三章 FFmpeg 入门**](docs/03_ffmpeg_beginning.md)
     + 配置环境
