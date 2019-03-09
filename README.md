@@ -9,7 +9,7 @@ FFmpeg教程，个人维护版本
     + 起因
     + 目标读者
 
-- [**第一章 视频基础**(暂未编写)](docs/01_video_introduce.md)
+- [**第一章 视频基础**](docs/01_video_introduce.md)
     + 颜色空间
         * RGB颜色空间
         * YUV颜色空间
