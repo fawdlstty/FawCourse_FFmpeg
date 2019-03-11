@@ -346,7 +346,7 @@ int main (int argc, char* argv[]) {
 }
 ```
 
-[返回首页](../README.md) | [上一章 音视频格式处理](./05_format_process.md) | 下一章
+[返回首页](../README.md) | [上一章 音视频格式处理](./05_format_process.md) | [下一章 Filter 滤镜](./07_filter.md)
 
 ## 许可
 

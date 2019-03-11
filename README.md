@@ -49,6 +49,10 @@ FFmpeg教程，个人维护版本
     + 枚举dshow设备
     + 程序结构
 
+- [**第七章 Filter 滤镜**](docs/07_filter.md)
+    + 滤镜语法
+        * 文字滤镜
+
 ## 许可
 
 [![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
