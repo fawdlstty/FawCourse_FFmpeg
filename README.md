@@ -1,6 +1,8 @@
 # FawCourse_FFmpeg
 
-FFmpeg教程，个人维护版本
+FFmpeg教程，非控制台模式
+
+[所有示例](example/README.md)
 
 ## 目录
 
@@ -43,6 +45,7 @@ FFmpeg教程，个人维护版本
 - [**第六章 FFmpeg与其他库的交互**](docs/06_interaction.md)
     + AVFrame与Qt图片互转
     + AVFrame与GDI+图片互转
+    + SDL1播放视频
     + SDL2播放视频
     + SDL2播放音频
     + wave函数播放音频

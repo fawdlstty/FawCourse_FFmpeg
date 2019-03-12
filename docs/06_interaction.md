@@ -52,17 +52,18 @@ memcpy (_frame_rgb32->data [0], _data.Scan0, _frame_rgb32->width * _frame_rgb32-
 _bmp.UnlockBits (&_data);
 ```
 
-## SDL2播放视频
+## SDL1播放视频
 
 ```cpp
-// 首先是SDL初始化代码，不要忘了
+// 首先是SDL初始化代码
+SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
 // 然后是创建SDL2窗口及SDL2图片
 SDL_Surface *_screen = SDL_SetVideoMode (_frame_yuv420p->width, _frame_yuv420p->height, 0, SDL_SWSURFACE);
 SDL_Overlay *_bmp = SDL_CreateYUVOverlay (_frame_yuv420p->width, _frame_yuv420p->height, SDL_YV12_OVERLAY, _screen);
 SDL_Rect _rect { 0, 0, _frame_yuv420p->width, _frame_yuv420p->height };
 
-// 然后是循环播放内部，将AVFrame结构体数据移动到SDL2图片上
+// 然后是循环播放内部，将AVFrame结构体数据移动到SDL图片上
 SDL_LockYUVOverlay (_bmp);
 memcpy (_bmp->pixels [0], _frame_yuv420p->data [0], _frame_yuv420p->width * _frame_yuv420p->height);
 memcpy (_bmp->pixels [1], _frame_yuv420p->data [1], _frame_yuv420p->width * _frame_yuv420p->height / 4);
@@ -72,13 +73,41 @@ _frame_yuv420p->linesize [1] = _bmp->pitches [2];
 _frame_yuv420p->linesize [2] = _bmp->pitches [1];
 SDL_UnlockYUVOverlay (_bmp);
 SDL_DisplayYUVOverlay (_bmp, &_rect);
-// 然后是暂停多少毫秒。调用SDL2暂停的意义在于，这个函数可以切换线程到SDL2窗口，使得SDL2窗口能响应消息事件
+// 暂停
 SDL_Delay (50);
 
 // 展示完毕，退出
 SDL_Quit ();
+```
 
-// 另外，我个人不推荐使用SDL2来展示视频，我的建议是，根据需求转为Qt或GDI+图片然后使用界面库或3D库来展示
+## SDL2播放视频
+
+```cpp
+// 首先是SDL初始化代码
+SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
+
+// 然后是创建SDL2窗口及SDL2图片
+SDL_Window *_screen = SDL_CreateWindow ("My Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+SDL_Renderer* _sdlRenderer = SDL_CreateRenderer (_screen, -1, 0);
+SDL_Texture* _sdlTexture = SDL_CreateTexture (_sdlRenderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, 640, 480);
+SDL_Rect _rect { 0, 0, 640, 480 };
+
+// 然后是循环播放内部，将AVFrame结构体数据移动到SDL2图片上
+int _sz = _frame_yuv420p->width * _frame_yuv420p->height;
+uint8_t *_buf = new uint8_t [_sz * 3 / 2];
+memcpy (_buf, _frame_yuv420p->data [0], _sz);
+memcpy (_buf + _sz * 5 / 4, _frame_yuv420p->data [1], _sz / 4);
+memcpy (_buf + _sz, _frame_yuv420p->data [2], _sz / 4);
+SDL_UpdateTexture (_sdlTexture, NULL, _buf, 640);
+SDL_RenderClear (_sdlRenderer);
+SDL_RenderCopy (_sdlRenderer, _sdlTexture, NULL, &_rect);
+SDL_RenderPresent (_sdlRenderer);
+delete _buf;
+// 暂停
+SDL_Delay (50);
+
+// 展示完毕，退出
+SDL_Quit ();
 ```
 
 ## SDL2播放音频
