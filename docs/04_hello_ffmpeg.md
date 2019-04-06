@@ -91,6 +91,39 @@ m_ifmt_ctx->flags |= AVFMT_FLAG_NOBUFFER;
 
 此处如果需要实现屏幕录制，那么 _fmt_name 的值为“gdigrab”，_in_url 的值为“desktop”。
 
+`avformat_open_input` 的最后一个参数指定参数，比如对于摄像头设备，常用三个参数，一个是分辨率，一个是编码方式，一个是fps。代码如下：
+
+```cpp
+AVDictionary *_dic = nullptr;
+// 指定视频大小
+av_dict_set (&_dic, "video_size", "640x480", 0);
+// 指定编码方式
+av_dict_set (&_dic, "vcodec", "mjpeg", 0);
+// 指定帧率
+av_dict_set (&_dic, "framerate", "20", 0);
+int _ret = avformat_open_input (&m_ifmt_ctx, _in_url, _ipt_fmt, _dic);
+av_dict_free (&_dic);
+//...
+```
+
+其中指定视频大小的作用是，指定后，后续读到的帧包的大小即为指定的大小，如果指定的大小无效那么打开设备失败；编码方式这个，默认摄像头几乎都支持YUYV422编码与MJPEG编码，不指定默认YUYV422编码，但这种编码对于视频大小较大的时候，帧率下降的特别厉害，所以很多时候需要换成MJPEG方式；最后的这个帧率为指定帧率，当摄像头不支持此帧率时，将返回失败。
+
+获取摄像头支持情况使用如下命令行获取：
+
+`ffmpeg -list_options true -f dshow -i video="camera name"`
+
+结果中每行代表一种摄像头打开方式，pixel_format=yuyv422代表使用
+
+```cpp
+av_dict_set (&_dic, "pixel_format", "yuyv422", 0);
+```
+
+这行代码可以指定以这种编码方式；vcodec=mjpeg同理：
+
+```cpp
+av_dict_set (&_dic, "vcodec", "mjpeg", 0);
+```
+
 打开摄像头后，接下来的任务是查找流信息。以下代码是通过设备获取的内容来自动判断流的信息。这块代码用来判断摄像头/麦克风或文件是没问题的，但如果用来拉流，比如看别人直播，这时候这函数需要执行的时间就很长了，大概5秒左右，那个时候优化的方法是，在自己提前知道了拉流格式后，自己填充流信息。
 
 此处我们打开的设备比较简单，所以简单的使用“查找流信息”函数即可。
