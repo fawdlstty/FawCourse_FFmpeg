@@ -332,6 +332,14 @@ av_packet_free (&_pkt);
 
 ## 写帧
 
+写帧前先写入header代表开始写帧：
+
+```cpp
+avformat_write_header (_fmt_ctx, nullptr);
+```
+
+然后写帧有一点需要注意，dts和pts最好不要自己计算生成，而是通过编解码生成。比如视频中有b帧的情况，dts与pts就是有规律的乱序了。所以我们需要找到音视频编码的地方，在 `avcodec_send_frame` 函数调用之前调用 `_frame->pts = av_gettime ();` 设置时间戳，这样ffmpeg就能自动计算出有效的pts与dts了。关于音视频编解码将在下章讲述，下面为时基转换及发送：
+
 ```cpp
 // 初始化设置
 int64_t _start_pts = av_gettime ();
@@ -358,6 +366,12 @@ if ((_ret = av_write_frame(m_ofmt_ctx, m_pkt_send)) < 0) {
     printf ("av_write_frame(av_interleaved_write_frame) failed %d\n", _ret);
     return false;
 }
+```
+
+写帧后再写入trailer代表结束写帧：
+
+```cpp
+av_write_trailer (_fmt_ctx);
 ```
 
 ## 程序结构
