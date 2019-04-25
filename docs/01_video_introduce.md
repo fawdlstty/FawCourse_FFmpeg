@@ -37,7 +37,7 @@
 
 RGB转YUV公式为：
 
-```
+```cpp
 Y =   0.299    * R + 0.587    * G + 0.114    * B
 U = - 0.168736 * R - 0.331264 * G + 0.5      * B
 V =   0.5      * R - 0.418688 * G - 0.081312 * B
@@ -45,7 +45,7 @@ V =   0.5      * R - 0.418688 * G - 0.081312 * B
 
 YUV转RGB公式为：
 
-```
+```cpp
 R = Y + 1.402 * V
 G = Y - 0.344 * U - 0.714 * V
 B = Y + 1.772 * U
@@ -56,6 +56,10 @@ B = Y + 1.772 * U
 如果想要对视频编码了解的更加深入，推荐学习：[digital_video_introduction](https://github.com/leandromoreira/digital_video_introduction)
 
 [返回首页](../README.md) | [上一章 序言](./00_startup.md) | [下一章 音频基础](./02_audio_introduce.md)
+
+## 视频/图像的黑科技
+
+[阿里巴巴公司根据截图查到泄露信息的具体员工的技术是什么？](https://www.zhihu.com/question/50735753/answer/122593277)
 
 ## 许可
 

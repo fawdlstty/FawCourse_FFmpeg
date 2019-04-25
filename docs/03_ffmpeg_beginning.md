@@ -38,25 +38,55 @@
 
 采样率的意思是每秒钟存储多少个声音的值，主流使用44.1KHz，也就是每秒钟有44100个采样点，能满足绝大多数人的需求了。同时人类对采样率识别的极限是48KHz，也就是每秒钟有48000个采样点。超过这个频率的音质对人类来说没有任何区别，除非特殊场合，否则48KHz完全足够，主流依然是44.1KHz。
 
-## format、stream
+## 各种数据结构的生命周期
 
-FFmpeg中使用AVFormatContext来描述一个容器，这个结构体可用于读写流数据，比如读写flv、rmvb、mp3等文件或推流、拉流均使用这个结构体。
+FFmpeg对象的生命周期管理也是非常重要的内容，这一块如果不处理好非常容易导致内存泄露等情况。我个人习惯的方式是使用Visual Studio2017开发，里面有一款小工具Diagnostic Tools，可以很方便直观的展示内存及CPU使用率动态变化情况。FFmpeg一大难点也是这个，非常容易忽略生命周期的管理，从而导致内存泄露，在没有这工具的情况下很难排查具体泄漏点。这一章将直观的讲述生命周期的管理，配合内存监测类工具，可以很容易排查内存泄露的原因。
 
-结构体中nb_streams成员代表流的数量。比如一个mp3文件通常只有一个音频流；一个摄像头视频源通常只有一个视频流；一个flv容器通常有2-3个流，分别为视频流、音频流或视频流、音频流、字母流。通过结构体中streams成员进行访问。
+### AVCodec
 
-## codec、pixel format
+编码对象，通常通过 avcodec_find_decoder 函数，传入编码ID获得，可以直接抛弃，不用关心泄露。
 
-FFmpeg中使用一个AVCodecID枚举成员来表示一种音频或视频编码，也就是无法直接处理的编码（基本为已压缩编码），比如h264、vp9等。
+### AVFormatContext
 
-FFmpeg中使用一个AVPixelFormat枚举成员来表示一种像素格式，也就是可以直接处理的图像编码（均为未压缩编码），比如RGB24、YUV420P等。
+最重要的对象之一，用于维护一个输入流或输出流，通常通过 avformat_alloc_output_context2 函数打开，由 avformat_close_input 函数释放。对于文件对象，生命周期类似文件句柄；对于网络IO对象，生命周期类似C语言网络函数中的SOCKET句柄。
 
-FFmpeg中使用一个AVSampleFormat枚举成员来表示一种音频采样格式，也就是可以直接处理的音频编码（均为未处理编码），比如s16（有符号16位整数）等。
+### AVStream
 
-## packet、frame
+这个类的作用就是指定具体的流的类型，比如一个MP4文件有音视频数据，那么处理这个文件就由一个 AVFormatContext 对象来维护，可以通过这个对象访问两个 AVStream 对象，一个用于视频的处理（读或写），一个用于音频的处理（读或写）
 
-FFmpeg中使用AVPacket来代表一个数据包，通常从音视频文件中读出来的、摄像头麦克风读出来的、或即将写入文件的音视频数据，均使用这种结构体来描述数据。基本上为已压缩的编码。很多人可能有疑问，雷神的博客很多直接从文件中读AVFrame，或者直接将AVFrame写文件的骚操作又是啥？其实这种情况下读写的文件都是自定义的格式，而不是标准格式了。这样写出的文件，100%的常用音视频软件都无法直接解析。只有在测试的时候用用，学会这一块之后都不要这么操作了。
+在读流的情况下，使用 avformat_find_stream_info 找出所有流的信息同时打开所有流，生命周期此时将交于 AVFormatContext 对象托管，不用再关心泄露。
 
-FFmpeg中使用AVFrame来代表一个音视频帧，一帧图像是一个未压缩的完整画面，可用于直接处理，比如瘦脸、去绿幕背景等，均由操作AVFrame实现；另外还可能是一帧音频，里面包括的采样数不一定，可能是320、480，也可能是1024、10000等等。
+在写流的情况下，使用 avformat_new_stream 创建新的流并关联至 AVFormatContext，生命周期此时将交于 AVFormatContext 对象托管，不用再关心泄露。
+
+### AVCodecContext
+
+用于将数据进行编解码，比如将yuv420p编码为h264数据，或者将aac数据解码为fltp格式数据，音视频编解码全靠这个类。
+
+它可以独立存在，也能与 AVStream 相关联；通常一个 AVStream 对象就有一个 AVCodecContext。当它与 AVStream 关联后，生命周期与 AVStream 一样，交给 AVFormatContext 对象管理。
+
+通常写流时通过制定参数，然后通过 avcodec_open2 打开编码；读流时在通过 avcodec_find_decoder 找到 AVCodec* 后，通过 avcodec_open2 打开编码。
+
+如果它没有与 AVStream 相关联，那么需要手动关闭，先 avcodec_close，再 avcodec_free_context。
+
+### AVInputFormat
+
+用于查找输入流的对象，在通过 avformat_open_input 使用后，生命周期将交于 AVFormatContext 对象托管，不用再关心泄露。
+
+### AVDictionary
+
+通常用于打开前指定参数，使用 av_dict_set 函数设置；使用完毕后通过 av_dict_free 函数释放。
+
+### AVPacket
+
+一个这个结构代表一个数据包，用于存储编码后的数据，比如h264 raw数据或aac raw数据。这个数据结构由两部分组成，结构本身和数据部分。
+
+结构本身通过 av_packet_alloc 与 av_packet_free 分配及释放；数据部分通常通过 avcodec_receive_packet 或 av_read_frame 也就是编码后或者从流管道获取一帧数据，由于可能有多个 AVPacket 引用同一块数据，所以不能直接释放，需使用 av_packet_unref 结束引用这一块数据，如果没有结构再引用数据后，数据内存区域将自动释放。
+
+### AVFrame
+
+用于储存音视频的一帧数据，可以储存视频图像的rgb或yuv像素格式数据，也可以储存音频的s16或fltp采样格式数据，其中音频一帧的采样数与时长是不定的，一帧可能有几十毫秒时长的数据，也可能有半秒时长的数据。
+
+结构本身通过 av_frame_alloc 与 av_frame_free 分配及释放；数据部分通常通过 avcodec_receive_frame 或 av_frame_get_buffer 解码 AVPacket 或者自己分配。同ACPacket一样，由于可能有多个 AVFrame 引用同一块数据，所以不能直接释放，需使用 av_frame_unref 结束引用这一块数据，如果没有结构再引用数据后，数据内存区域将自动释放。
 
 [返回首页](../README.md) | [上一章 音频基础](./02_audio_introduce.md) | [下一章 Hello FFmpeg](./04_hello_ffmpeg.md)
 

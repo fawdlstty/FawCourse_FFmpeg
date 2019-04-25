@@ -16,16 +16,25 @@ FFmpeg教程，非控制台模式
         * RGB颜色空间
         * YUV颜色空间
     + 推荐资料
-- [**第二章 音频基础**(暂未编写)](docs/02_audio_introduce.md)
+    + 视频/图像的黑科技
+- [**第二章 音频基础**](docs/02_audio_introduce.md)
+    + 音频采样率
+    + 声音的黑科技
 - [**第三章 FFmpeg 入门**](docs/03_ffmpeg_beginning.md)
     + 配置环境
     + 容器及编码
         * 容器
         * 图像编码
         * 音频编码
-    + format、stream
-    + codec、pixel format
-    + packet、frame
+    + 各种数据结构的生命周期
+        * AVCodec
+        * AVFormatContext
+        * AVStream
+        * AVCodecContext
+        * AVInputFormat
+        * AVDictionary
+        * AVPacket
+        * AVFrame
 - [**第四章 Hello FFmpeg**](docs/04_hello_ffmpeg.md)
     + 头文件
     + 初始化
