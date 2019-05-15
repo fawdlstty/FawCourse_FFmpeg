@@ -61,6 +61,8 @@ B = Y + 1.772 * U
 
 [阿里巴巴公司根据截图查到泄露信息的具体员工的技术是什么？](https://www.zhihu.com/question/50735753/answer/122593277)
 
+[这种像是点阵图的是如何做到放大后是另一张图片的?](https://www.zhihu.com/question/43473759/answer/118721356)
+
 ## 许可
 
 [![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
