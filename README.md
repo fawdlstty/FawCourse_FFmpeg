@@ -59,6 +59,7 @@ FFmpeg教程，非控制台模式
     + SDL2播放音频
     + wave函数播放音频
     + 枚举dshow设备
+    + Windows捕获扬声器输出
     + 程序结构
 
 - [**第七章 Filter 滤镜**](docs/07_filter.md)

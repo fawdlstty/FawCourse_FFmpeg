@@ -309,6 +309,148 @@ if (pSysDevEnum)
     pSysDevEnum->Release ();
 ```
 
+## Windows捕获扬声器输出
+
+一个通过调用COM+组件实现的例子，代码比较多，不建议实际去研究，用着没问题就行了。有一个问题需要注意下：Win764位系统上不支持设置通道数，一旦设置后很容易捕获失败，所以后面需要自己手动转一次。代码中已经已经将音频数据转为了FFmpeg可用的AVFrame，可以直接用于处理或转码。
+
+```cpp
+HRESULT _r = 0;
+DWORD _nTaskIndex = 0;
+REFERENCE_TIME _hnsDefaultDevicePeriod = 0;
+LARGE_INTEGER _liFirstFire { 0 };
+//
+HANDLE _hEventStarted = ::CreateEvent (NULL, TRUE, FALSE, NULL);
+HANDLE _hEventStop = ::CreateEvent (NULL, TRUE, FALSE, NULL);
+HANDLE _hTimerWakeUp = ::CreateWaitableTimer (NULL, FALSE, NULL);
+HANDLE _hTask = AvSetMmThreadCharacteristics (_T ("Capture"), &_nTaskIndex);
+SetEvent (_hEventStarted);
+AVFrame *_frame = av_frame_alloc ();
+//
+IMMDeviceEnumerator *_pEnumerator = nullptr;
+IMMDevice *_pDevice = nullptr;
+IAudioClient *_pAudioClient = nullptr;
+WAVEFORMATEX *_pwfx = nullptr;
+IAudioCaptureClient *_pCaptureClient = nullptr;
+do {
+    if (FAILED (_r = CoCreateInstance (__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**) &_pEnumerator))) {
+        LOG_INFO ("CoCreateInstance failed %d", _r);
+        break;
+    }
+    if (FAILED (_r = _pEnumerator->GetDefaultAudioEndpoint (eRender, eConsole, &_pDevice))) {
+        LOG_INFO ("_pEnumerator->GetDefaultAudioEndpoint failed %d", _r);
+        break;
+    }
+    if (FAILED (_r = _pDevice->Activate (__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**) &_pAudioClient))) {
+        LOG_INFO ("_pDevice->Activate failed %d", _r);
+        break;
+    }
+    if (FAILED (_r = _pAudioClient->GetDevicePeriod (&_hnsDefaultDevicePeriod, NULL))) {
+        LOG_INFO ("_pAudioClient->GetDevicePeriod failed %d", _r);
+        break;
+    }
+    if (FAILED (_r = _pAudioClient->GetMixFormat (&_pwfx))) {
+        LOG_INFO ("_pAudioClient->GetMixFormat failed %d", _r);
+        break;
+    }
+    //
+    _pwfx->wBitsPerSample = 16;
+    _pwfx->nSamplesPerSec = _sample_rate;
+    //_pwfx->nChannels = _channel_num;
+    _pwfx->nBlockAlign = _pwfx->nChannels * _pwfx->wBitsPerSample / 8;
+    _pwfx->nAvgBytesPerSec = _pwfx->nBlockAlign * _pwfx->nSamplesPerSec;
+    if (_pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+        _pwfx->wFormatTag = WAVE_FORMAT_PCM;
+    } else if (_pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        PWAVEFORMATEXTENSIBLE _pEx = reinterpret_cast<PWAVEFORMATEXTENSIBLE>(_pwfx);
+        if (IsEqualGUID (KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, _pEx->SubFormat)) {
+            _pEx->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+            _pEx->Samples.wValidBitsPerSample = _pwfx->wBitsPerSample;
+        }
+    } else {
+        LOG_INFO ("unknown format 0x%04X", _pwfx->wFormatTag);
+        break;
+    }
+    //
+    size_t _FrameSize = (_pwfx->wBitsPerSample / 8) * _pwfx->nChannels;// 每帧长度（字节）
+    _frame->channels = _pwfx->nChannels;
+    _frame->channel_layout = av_get_default_channel_layout (_frame->channels);
+    _frame->sample_rate = _pwfx->nSamplesPerSec;
+    _frame->format = AV_SAMPLE_FMT_S16;
+    //_frame->format = AV_SAMPLE_FMT_FLT;
+    //
+    if (FAILED (_r = _pAudioClient->Initialize (AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK, 0, 0, _pwfx, nullptr))) {
+        LOG_INFO ("_pAudioClient->Initialize failed %d", _r);
+        break;
+    }
+    if (FAILED (_r = _pAudioClient->GetService (__uuidof(IAudioCaptureClient), (void**) &_pCaptureClient))) {
+        LOG_INFO ("_pAudioClient->GetService failed %d", _r);
+        break;
+    }
+    _liFirstFire.QuadPart = -_hnsDefaultDevicePeriod / 2; // negative means relative time
+    LONG _lTimeBetweenFires = (LONG) _hnsDefaultDevicePeriod / 2 / (10 * 1000); // convert to milliseconds
+    if (!SetWaitableTimer (_hTimerWakeUp, &_liFirstFire, _lTimeBetweenFires, NULL, NULL, FALSE)) {
+        LOG_INFO ("SetWaitableTimer failed %d", ::GetLastError ());
+        break;
+    }
+    if (FAILED (_r = _pAudioClient->Start ())) {
+        LOG_INFO ("_pAudioClient->Start failed %d", _r);
+        break;
+    }
+    //
+    HANDLE _waitArray [2] = { _hEventStop, _hTimerWakeUp };
+    while (true) {
+        DWORD _dwWaitResult = WaitForMultipleObjects (_countof (_waitArray), _waitArray, FALSE, INFINITE);
+        if (WAIT_OBJECT_0 + 1 != _dwWaitResult)
+            break;
+        UINT32 _nNextPacketSize = 0;
+        if (FAILED (_r = _pCaptureClient->GetNextPacketSize (&_nNextPacketSize)))
+            break;
+        if (_nNextPacketSize == 0)
+            continue;
+        //
+        BYTE *_pData = nullptr;
+        UINT32 _nNumFramesToRead = 0;
+        DWORD _dwFlags = 0;
+        if (FAILED (_r = _pCaptureClient->GetBuffer (&_pData, &_nNumFramesToRead, &_dwFlags, nullptr, nullptr))) {
+            break;
+        }
+        if (_nNumFramesToRead == 0)
+            continue;
+        if (_frame->nb_samples != _nNumFramesToRead) {// * _pwfx->nChannels
+            if (_frame->data [0])
+                av_frame_unref (_frame);
+            _frame->nb_samples = _nNumFramesToRead;// * _pwfx->nChannels
+            av_frame_get_buffer (_frame, 1);
+        }
+        //
+        if ((_dwFlags & AUDCLNT_BUFFERFLAGS_SILENT) > 0) {
+            memset (_frame->data [0], 0, _nNumFramesToRead*_FrameSize);
+        } else {
+            ::CopyMemory (_frame->data [0], _pData, _nNumFramesToRead*_FrameSize);
+        }
+        // 此处已转码成功
+        // _callback (_frame);
+        _pCaptureClient->ReleaseBuffer (_nNumFramesToRead);
+    }
+} while (false);
+//
+if (_pCaptureClient)
+    _pCaptureClient->Release ();
+av_frame_free (&_frame);
+if (_pwfx)
+    CoTaskMemFree (_pwfx);
+if (_pAudioClient)
+    _pAudioClient->Release ();
+if (_pDevice)
+    _pDevice->Release ();
+if (_pEnumerator)
+    _pEnumerator->Release ();
+AvRevertMmThreadCharacteristics (_hTask);
+::CloseHandle (_hTimerWakeUp);
+::CloseHandle (_hEventStop);
+::CloseHandle (_hEventStarted);
+```
+
 ## 程序结构
 
 对于播放器来说，只需要解码然后展示就行了
