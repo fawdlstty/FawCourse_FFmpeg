@@ -218,33 +218,19 @@ if (!_ostm) {
 // 指定视频编码器信息
 AVCodecContext *_codec_ctx = _ostm->codec;// avcodec_alloc_context3 (_ocodec);
 _codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
-_codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
-_codec_ctx->bit_rate = _height * 1000;
+_codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // AV_PIX_FMT_YUV420P    
+_codec_ctx->bit_rate = 1200000;// _height * 4000;
 _codec_ctx->width = _width;
 _codec_ctx->height = _height;
 _codec_ctx->time_base = { 1, 1000 };
-_codec_ctx->gop_size = m_fps;
-_codec_ctx->max_b_frames = 3;
-_codec_ctx->qmin = 10;
+_codec_ctx->ticks_per_frame = 1000 / m_fps;
+_codec_ctx->gop_size = 12;
+_codec_ctx->max_b_frames = 0;
+_codec_ctx->qmin = 21;
 _codec_ctx->qmax = 31;
 _codec_ctx->framerate = { m_fps, 1 };
-_codec_ctx->keyint_min = 25;
-_codec_ctx->qcompress = 0.5;
-_codec_ctx->qblur = 0.5;
-_codec_ctx->max_qdiff = 3;
-_codec_ctx->rc_initial_buffer_occupancy = 0;
-_codec_ctx->trellis = 0;
 _codec_ctx->profile = FF_PROFILE_H264_MAIN;
-_codec_ctx->level = 30;
-//
-//_codec_ctx->me_cmp = 0;
-//_codec_ctx->me_subpel_quality = 8;
-//_codec_ctx->me_range = 0;
-_codec_ctx->chroma_sample_location = AVCHROMA_LOC_LEFT;
-_codec_ctx->field_order = AV_FIELD_PROGRESSIVE;
-//_codec_ctx->coder_type = FF_CODER_TYPE_VLC;
-//_codec_ctx->min_prediction_order = -1;
-//_codec_ctx->max_prediction_order = -1;
+//_codec_ctx->level = 22;
 AVDictionary *_param = nullptr;
 if (_codec_ctx->codec_id == AV_CODEC_ID_H264) {
     av_dict_set (&_param, "preset", "ultrafast", 0);
@@ -257,22 +243,15 @@ if (_codec_ctx->codec_id == AV_CODEC_ID_H264) {
 // 指定音频编码器信息
 uint64_t _channel_layout = AV_CH_LAYOUT_MONO; // 单声道，如果双声道那么 AV_CH_LAYOUT_STEREO
 AVCodecContext *_codec_ctx = _ostm->codec;
-_codec_ctx->bit_rate = 44100 * 4;
+_codec_ctx->bit_rate = 48000 * 4;
 _codec_ctx->bit_rate_tolerance = 4000000;
 _codec_ctx->time_base = { 1, 1000 };
-_codec_ctx->sample_rate = 44100;
-_codec_ctx->channel_layout = _channel_layout;// (_channel_layout > 0 _channel_layout : (_channels > 1 ? AV_CH_LAYOUT_STEREO : AV_CH_FRONT_CENTER));
-_codec_ctx->channels = av_get_channel_layout_nb_channels(_codec_ctx->channel_layout);// _channels;
+_codec_ctx->sample_rate = 48000;
+_codec_ctx->channel_layout = _channel_layout;
+_codec_ctx->channels = av_get_channel_layout_nb_channels (_codec_ctx->channel_layout);
 _codec_ctx->sample_fmt = _codec->sample_fmts [0];///AV_SAMPLE_FMT_FLTP;
-_codec_ctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-_codec_ctx->keyint_min = 25;
-_codec_ctx->qcompress = 0.5;
-_codec_ctx->qblur = 0.5;
-_codec_ctx->max_qdiff = 3;
-_codec_ctx->rc_initial_buffer_occupancy = 0;
-_codec_ctx->trellis = 0;
 _codec_ctx->profile = FF_PROFILE_AAC_MAIN;
-_codec_ctx->level = 30;
+//_codec_ctx->level = 30;
 AVDictionary *_param = nullptr;
 if (_codec_ctx->codec_id == AV_CODEC_ID_AAC) {
     av_dict_set (&_param, "aac_coder", "fast", 0);
