@@ -17,18 +17,21 @@ AVFrame *_frame = av_frame_alloc ();
 // ...
 
 // 将原始帧包解码
-av_frame_make_writable (_frame);
 if ((_ret = avcodec_send_packet (m_ifmt_ctx->streams [_pkt->stream_index]->codec, _pkt)) != 0) {
     printf ("avcodec_send_packet failed %d\n", _ret);
     break;
 }
-_ret = avcodec_receive_frame (m_fmt_ctx->streams [_pkt->stream_index]->codec, _frame);
-if (_ret == AVERROR (EAGAIN) || _ret == AVERROR_EOF) {
-    std::this_thread::sleep_for (std::chrono::milliseconds (1));
-    continue;
-} else if (_ret != 0) {
-    printf ("avcodec_receive_frame failed %d\n", _ret);
-    break;
+while (true) {
+    av_frame_make_writable (_frame);
+    _ret = avcodec_receive_frame (m_fmt_ctx->streams [_pkt->stream_index]->codec, _frame);
+    if (_ret == AVERROR (EAGAIN) || _ret == AVERROR_EOF) {
+        std::this_thread::sleep_for (std::chrono::milliseconds (1));
+        break;
+    } else if (_ret != 0) {
+        printf ("avcodec_receive_frame failed %d\n", _ret);
+        break;
+    }
+    // 此处处理frame
 }
 
 // ...
