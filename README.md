@@ -69,6 +69,8 @@ FFmpeg教程，非控制台模式
     + 非滤镜音频处理
     + 滤镜的使用
 
+- [**第八章 常见问题**](docs/08_FAQ.md)
+
 ## 许可
 
 [![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
