@@ -174,7 +174,7 @@ drawtext=fontsize=100:fontfile=a.ttf:text='hello':x=20:y=20
 
 参考：[ffmpeg-filters](https://ffmpeg.org/ffmpeg-filters.html)
 
-[返回首页](../README.md) | [上一章 FFmpeg与其他库的交互](./06_interaction.md) | [下一章 常见问题](./08_FAQ.md)
+[返回首页](../README.md) | [上一章 FFmpeg与其他库的交互](./06_interaction.md) | [下一章 硬编码加速](./08_hard.md)
 
 ## 许可
 
