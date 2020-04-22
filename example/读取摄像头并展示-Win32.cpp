@@ -1,4 +1,4 @@
-﻿// 编译前请在项目属性中关闭SDL检查
+// 编译前请在项目属性中关闭SDL检查
 #include <SDKDDKVer.h>
 //#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -55,7 +55,7 @@ AVFrame *m_frame_rgb32 = nullptr;
 
 // 视频格式转换
 // 视频格式转换
-AVFrame *_video_format_convet (AVFrame *_frame_src, AVPixelFormat _new_fmt, int _new_width = 0, int _new_height = 0) {
+AVFrame *_video_format_convert (AVFrame *_frame_src, AVPixelFormat _new_fmt, int _new_width = 0, int _new_height = 0) {
 	AVFrame *_frame_dest = av_frame_alloc ();
 	_frame_dest->width = (_new_width > 0 ? _new_width : _frame_src->width);
 	_frame_dest->height = (_new_height > 0 ? _new_height : _frame_src->height);
@@ -222,7 +222,7 @@ int APIENTRY _tWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpC
 						av_frame_unref (m_frame_rgb32);
 						av_frame_free (&m_frame_rgb32);
 					}
-					m_frame_rgb32 = _video_format_convet (_frame, AV_PIX_FMT_RGB32, 640, 480);
+					m_frame_rgb32 = _video_format_convert (_frame, AV_PIX_FMT_RGB32, 640, 480);
 					RECT rect { 0, 0, 640, 480 };
 					InvalidateRect (hWnd, &rect, FALSE);
 				}
