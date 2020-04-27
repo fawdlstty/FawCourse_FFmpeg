@@ -101,7 +101,7 @@ av_dict_set (&_dic, "video_size", "640x480", 0);
 av_dict_set (&_dic, "vcodec", "mjpeg", 0);
 // 指定帧率
 av_dict_set (&_dic, "framerate", "20", 0);
-int _ret = avformat_open_input (&m_ifmt_ctx, _in_url, _ipt_fmt, _dic);
+int _ret = avformat_open_input (&m_ifmt_ctx, _in_url, _ipt_fmt, &_dic);
 av_dict_free (&_dic);
 //...
 ```
