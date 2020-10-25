@@ -19,11 +19,3 @@ FFmpeg算是我个人近期入门时间最长的一个库了，学它耗费了�
 
 1. 本教程假定读者已经熟悉了传统 C/C++ ，至少在阅读传统 C++ 代码上不具备任何困难，渴望在短时间内迅速了解**音视频**原理的人或需要对**音视频**做处理的人非常适合；
 2. 本教程一定程度上整理了音视频领域开发的关键点，对FFmpeg开发比较熟悉，需要一本方便随时查阅的读者。
-
-[返回首页](../README.md) | 上一章 | [下一章 视频基础](./01_video_introduce.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

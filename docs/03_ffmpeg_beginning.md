@@ -87,11 +87,3 @@ FFmpeg对象的生命周期管理也是非常重要的内容，这一块如果�
 用于储存音视频的一帧数据，可以储存视频图像的rgb或yuv像素格式数据，也可以储存音频的s16或fltp采样格式数据，其中音频一帧的采样数与时长是不定的，一帧可能有几十毫秒时长的数据，也可能有半秒时长的数据。
 
 结构本身通过 av_frame_alloc 与 av_frame_free 分配及释放；数据部分通常通过 avcodec_receive_frame 或 av_frame_get_buffer 解码 AVPacket 或者自己分配。同ACPacket一样，由于可能有多个 AVFrame 引用同一块数据，所以不能直接释放，需使用 av_frame_unref 结束引用这一块数据，如果没有结构再引用数据后，数据内存区域将自动释放。
-
-[返回首页](../README.md) | [上一章 音频基础](./02_audio_introduce.md) | [下一章 Hello FFmpeg](./04_hello_ffmpeg.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

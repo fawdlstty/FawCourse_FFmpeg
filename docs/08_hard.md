@@ -9,7 +9,7 @@
 FFmpeg编译一直是难上加难，对于不会编译的开发者们来说最方便的方式莫过于使用编译好的库（如果没有找到最合适自己的硬编方式那么需要手工编译了）：  
 [部分收集的资源](../assets/build/)
 
-## Intel QSV 指令加速
+## 编译intel硬编码
 
 这个应该算兼容性最强的编码方式了，在绝大部分intel cpu上都能运行，但有个问题是，只能按照特定方式编码，并未支持所有的h264编码方式，具体验证是否支持需手工尝试。
 
@@ -20,7 +20,7 @@ FFmpeg编译一直是难上加难，对于不会编译的开发者们来说最�
 1. 安装：mfx_dispatcher
 2. configure 新增命令行：`--enable-libmfx --enable-encoder=h264_qsv --enable-decoder=h264_qsv`
 
-## NVIDIA 显卡加速
+## 编译nvidia硬编码
 
 这个应该算综合指数最佳的编码方式，有条件选N卡硬编那就选N卡硬编，一方面用户量大，另一方面效果非常好。
 
@@ -45,18 +45,10 @@ AVCodec *_ocodec = avcodec_find_encoder (AV_CODEC_ID_H264);
 AVCodec *_ocodec = avcodec_find_encoder_by_name ("nvenc_h264"); // 或者 h264_nvenc，两者之一
 ```
 
-## AMD 显卡加速
+## 编译amd硬编码
 
 在我看来这是一种对于 NVIDIA 显卡加速的一种补充方式，它可以使得支持的用户更广，但 AMD 显卡的用户量比 NVIDIA 显卡用户量小得多，所以这种方式一般作为最后的支持选项。当然有条件全部硬编支持是最好的
 
 编码器/解码器：h264_amf
 
 编译方式：（大雾）
-
-[返回首页](../README.md) | [上一章 Filter 滤镜](./07_filter.md) | [下一章 常见问题](./09_FAQ.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

@@ -6,6 +6,8 @@ Windows客户端开发的小伙伴第一个想到的是GDI+吧？视频读入GDI
 
 我个人这儿是不太推荐使用滤镜的，滤镜难学，并且很容易出问题，如果对其他绘图库比较熟悉了，并且能解决问题了，那么尽量就不要用滤镜。滤镜相对于其他库来说效率并不会提高多少，唯一好处就是，不用附带其他绘图库，利于软件的三方库的统一。
 
+不过也不是一定不要用这个，如果恰好有跨平台需求，或者你没学过其他绘图库，或者想要实现幕布恰好滤镜自带等等，至于用不用这个全看取舍。
+
 ## 非滤镜图像处理
 
 这个比较简单，以GDI+为例：
@@ -119,7 +121,6 @@ _filter_o = nullptr;
 avfilter_graph_free (&_graph);
 ```
 
-<!--
 ## 滤镜语法
 
 滤镜的实现是通过滤镜语法来的，所以再实现滤镜前先说说滤镜语法。这种语法实际上是一种DSL，专为FFmpeg滤镜服务。
@@ -159,7 +160,7 @@ avfilter_graph_free (&_graph);
 
 参数介绍的差不多了，下面来实际写一串文本滤镜：
 
-```
+```ffmpeg
 drawtext=fontsize=100:fontfile=a.ttf:text='hello':x=20:y=20
 ```
 
@@ -167,17 +168,10 @@ drawtext=fontsize=100:fontfile=a.ttf:text='hello':x=20:y=20
 
 文本或者动态颜色字符串可以使用格式化方式来动态生成，比如
 
-```
+```ffmpeg
 ...text='%{localtime\:%Y-%m-%d %H\:%M\:%S}'...
 ```
--->
+
+另外，滤镜远远不止文字水印这么简单，可以对图像进行一些操作比如蒙版缩放等，也能对声音进行操作，如果官方没有的滤镜还能自己实现一个滤镜，接受参数同时按照自己的想法来处理。
 
 参考：[ffmpeg-filters](https://ffmpeg.org/ffmpeg-filters.html)
-
-[返回首页](../README.md) | [上一章 FFmpeg与其他库的交互](./06_interaction.md) | [下一章 硬编码加速](./08_hard.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

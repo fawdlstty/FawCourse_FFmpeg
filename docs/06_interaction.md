@@ -2,7 +2,7 @@
 
 视频软件不是仅靠一个FFmpeg就能完成。FFmpeg只包括流的读写及编码解码，其他操作都得靠其他库来实现。比如播放视频需要界面库；播放声音需要播放声音的库或系统API等。所以这一块也是重中之重。下面我介绍几种常用FFmpeg与其他库交互方式。
 
-## AVFrame与Qt图片互转
+## 将avframe与qt互转
 
 AVFrame转QImage比较简单，不过这儿有一个坑在于，直接指定数据的方式上面，一旦数据失效那么图片也会失效。此处的比较友好的做法是再构造一次
 
@@ -26,7 +26,7 @@ av_frame_get_buffer (_frame_rgb32, 0);
 memcpy (_frame_rgb32->data [0], img.bits (), _frame_rgb32->width * _frame_rgb32->height * 4);
 ```
 
-## AVFrame与GDI+图片互转
+## 将avframe与gdiplus互转
 
 AVFrame转Gdiplus::Bitmap也是比较容易的，不过还是需要注意GDI+初始化不要忘了
 
@@ -52,7 +52,7 @@ memcpy (_frame_rgb32->data [0], _data.Scan0, _frame_rgb32->width * _frame_rgb32-
 _bmp.UnlockBits (&_data);
 ```
 
-## SDL1播放视频
+## 使用sdl1播放视频
 
 ```cpp
 // 首先是SDL初始化代码
@@ -80,7 +80,7 @@ SDL_Delay (50);
 SDL_Quit ();
 ```
 
-## SDL2播放视频
+## 使用sdl2播放视频
 
 ```cpp
 // 首先是SDL初始化代码
@@ -110,7 +110,7 @@ SDL_Delay (50);
 SDL_Quit ();
 ```
 
-## SDL2播放音频
+## 使用sdl2播放音频
 
 SDL2播放音频有一个问题在于，仅支持单例。也就是不能创建两个对象一起播放。
 
@@ -157,7 +157,7 @@ while (_audio_len > 0)
 SDL_CloseAudio ();
 ```
 
-## wave函数播放音频
+## 使用wave函数播放音频
 
 wave系列函数仅支持Windows平台，范围从WinXP到Win10，比较古老，但相对于SDL2来说可以少引用一个库。另外这两者的实现特别像，几乎可以不用修改架构实现与SDL2的互相迁移。
 
@@ -309,7 +309,7 @@ if (pSysDevEnum)
     pSysDevEnum->Release ();
 ```
 
-## Windows捕获扬声器输出
+## 使用windows捕获扬声器输出
 
 一个通过调用COM+组件实现的例子，代码比较多，不建议实际去研究，用着没问题就行了。有一个问题需要注意下：Win764位系统上不支持设置通道数，一旦设置后很容易捕获失败，所以后面需要自己手动转一次。代码中已经已经将音频数据转为了FFmpeg可用的AVFrame，可以直接用于处理或转码。
 
@@ -516,11 +516,3 @@ int main (int argc, char* argv[]) {
     return 0;
 }
 ```
-
-[返回首页](../README.md) | [上一章 音视频格式处理](./05_format_process.md) | [下一章 Filter 滤镜](./07_filter.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

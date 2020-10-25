@@ -47,11 +47,3 @@
 > 没法使用 `h264_high` 进行编码，即使设置后，也会退化为 `h264_main` 或 `h264_baseline`
 
 编码速度从 `ultrafast` 调整为 `superfast` 或更慢
-
-[返回首页](../README.md) | [上一章 硬编码加速](./08_hard.md) | 下一章
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

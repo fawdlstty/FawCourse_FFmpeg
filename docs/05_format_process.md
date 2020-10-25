@@ -243,11 +243,3 @@ int main (int argc, char* argv[]) {
     return 0;
 }
 ```
-
-[返回首页](../README.md) | [上一章 Hello FFmpeg](./04_hello_ffmpeg.md) | [下一章 FFmpeg与其他库的交互](./06_interaction.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。

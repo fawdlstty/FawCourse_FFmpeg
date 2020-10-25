@@ -51,7 +51,7 @@ avfilter_register_all ();
 //SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
 ```
 
-## 打开摄像头/麦克风
+## 打开摄像头及麦克风
 
 现在开始真正进入实际操作了，首先是打开设备。打开设备前首先需要指定设备类型。比如windows上通常以vfw、dshow打开摄像头，gdigrab打开屏幕录制，nullptr打开文件或拉流（比如看网红直播）。此处我们打开摄像头，就以dshow为示例：
 
@@ -376,11 +376,3 @@ int main (int argc, char* argv[]) {
 ```
 
 其实这时候，你已经能做到将flv1的图像与flv2的声音合并起来存入flv3中了。大胆试试吧
-
-[返回首页](../README.md) | [上一章 FFmpeg 入门](./03_ffmpeg_beginning.md) | [下一章 音视频格式处理](./05_format_process.md)
-
-## 许可
-
-[![test](https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-本教程采用[知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议](http://creativecommons.org/licenses/by-nc-nd/4.0/)许可。
