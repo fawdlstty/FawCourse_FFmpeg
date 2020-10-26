@@ -1,11 +1,6 @@
 # Summary
 
 - [介绍](README.md)
-- [所有示例](example/README.md)
-- [**序言**](docs/00_startup.md)
-    + [引言](docs/00_startup.md#引言)
-    + [起因](docs/00_startup.md#起因)
-    + [目标读者](docs/00_startup.md#目标读者)
 - [**第一章 视频基础**](docs/01_video_introduce.md)
     + [颜色空间](docs/01_video_introduce.md#颜色空间)
     + [推荐资料](docs/01_video_introduce.md#推荐资料)
@@ -55,3 +50,7 @@
 - [**附录1 人脸检测**](docs/a1_face_detect.md)
     + [人脸检测原理](docs/a1_face_detect.md#人脸检测原理)
     + [人脸检测实现](docs/a1_face_detect.md#人脸检测实现)
+    + [人脸贴图](docs/a1_face_detect.md#人脸贴图)
+- [**附录2 流媒体服务器**](docs/a2_media_server.md)
+    + [流媒体协议](docs/a2_media_server.md#流媒体协议)
+    + [搭建流媒体服务器](docs/a2_media_server.md#搭建流媒体服务器)

@@ -19,3 +19,9 @@
 当然除了这几个之外，还有其他的人脸识别库，每个库的模型都会有自己的偏向性，根据需求来确定。下面我们来使(bai)用(piao)，以ZQCNN为例：
 
 在仓库中`ZQCNN\SamplesZQCNN\SampleMTCNN_Video`路径下，有一个`SampleMTCNN_Video.cpp`，简单修改就能跑起来，它能识别摄像头并同步经过神经网络来动态识别人脸位置。
+
+## 人脸贴图
+
+找到人脸后，可能需要做一些贴纸，比如叼个烟枪之类的，这儿有个麻烦的地方是，如何计算缩放及旋转角度等。网上有篇文章说的非常好。
+
+地址：<https://cloud.tencent.com/developer/article/1536158>
