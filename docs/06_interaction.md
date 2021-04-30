@@ -184,11 +184,12 @@ _wfex.nSamplesPerSec = (DWORD) _frame_s16->sample_rate;
 _wfex.wBitsPerSample = 16;
 _wfex.cbSize = sizeof (_wfex);
 _wfex.nBlockAlign = _wfex.wBitsPerSample * _wfex.nChannels / 8;
-_wfex.nAvgBytesPerSec = _wfex.nBlockAlign;
+_wfex.nAvgBytesPerSec = m_wfex.nSamplesPerSec * m_wfex.nBlockAlign;
 if (::waveOutOpen (nullptr, 0, &_wfex, 0, 0, WAVE_FORMAT_QUERY) != 0) {
     printf ("waveOutOpen failed\n");
     return;
-}if (::waveOutOpen (&_hwo, WAVE_MAPPER, &_wfex, (DWORD_PTR) _wave_out_proc, (DWORD_PTR) this, CALLBACK_FUNCTION) != 0) {
+}
+if (::waveOutOpen (&_hwo, WAVE_MAPPER, &_wfex, (DWORD_PTR) _wave_out_proc, (DWORD_PTR) this, CALLBACK_FUNCTION) != 0) {
     printf ("waveOutOpen failed\n");
     return;
 }
