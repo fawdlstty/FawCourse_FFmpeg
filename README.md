@@ -32,6 +32,4 @@ FFmpeg算是我个人近期入门时间最长的一个库了，学它耗费了�
 
 开源协议：CC BY-NC-ND 4.0
 
-打赏：
-
-![打赏](donate.jpg)
+[打赏](donate.jpg)
