@@ -4,7 +4,7 @@ FFmpeg教程，非命令行模式
 
 [GitHub地址](https://github.com/fawdlstty/FawCourse_FFmpeg)
 
-[在线阅读](https://www.fawdlstty.com/ffmpeg/index.html)
+[在线阅读](https://ffmpeg.fawdlstty.com/)
 
 [所有示例](https://github.com/fawdlstty/FawCourse_FFmpeg/tree/master/example)
 
